@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>定密工作数字化管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #0d2818 100%);
+            min-height: 100vh;
+        }
+
+        /* 登录页面样式 */
+        .login-container {
+            display: flex;
+ justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a472a 0%, #0d2818 100%);
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .login-card h1 {
+            color: #1a472a;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .login-card .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .login-card input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .login-card input:focus {
+            outline: none;
+            border-color: #1a472a;
+            box-shadow: 0 0 10px rgba(26,71,42,0.2);
+        }
+
+        .login-card button {
+            width: 100%;
+            padding: 12px;
+            background: #1a472a;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+
+        .login-card button:hover {
+            background: #2d6a4f;
+        }
+
+        .error-msg {
+            color: #dc3545;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        /* 主界面样式 */
+        .main-container {
+            display: none;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1a472a;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-badge {
+            background: #1a472a;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        .dashboard {
+            display: flex;
+            min-height: calc(100vh - 60px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #1e2a2e;
+            color: white;
+            padding: 20px 0;
+        }
+
+        .sidebar .menu-item {
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar .menu-item:hover {
+            background: #2d3a3e;
+        }
+
+        .sidebar .menu-item.active {
+            background: #2d3a3e;
+            border-left-color: #4caf50;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            background: #f5f7fa;
+            overflow-y: auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .card h3 {
+            color: #1a472a;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            background: #1a472a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #2d6a4f;
+        }
+
+        button.secondary {
+            background: #6c757d;
+        }
+
+        button.secondary:hover {
+            background: #5a6268;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .status-topsecret { background: #dc3545; color: white; }
+        .status-confidential { background: #fd7e14; color: white; }
+        .status-secret { background: #ffc107; color: #333; }
+        .status-unclassified { background: #28a745; color: white; }
+        .status-unknown { background: #6c757d; color: white; }
+
+        .ai-result {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .point-item {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .point-level-3 { border-left: 3px solid #dc3545; }
+        .point-level-2 { border-left: 3px solid #fd7e14; }
+        .point-level-1 { border-left: 3px solid #ffc107; }
+
+        .flex {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            background: #333;
+            color: white;
+            z-index: 1000;
+            animation: fadeOut 3s forwards;
+        }
+
+        .message.success { background: #28a745; }
+        .message.error { background: #dc3545; }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录页面 -->
+    <div id="loginPage" class="login-container">
+        <div class="login-card">
+            <h1>📋 定密工作数字化管理系统</h1>
+            <div class="subtitle">Classification Management System</div>
+            <input type="text" id="loginUsername" placeholder="账号" autocomplete="off">
+            <input type="password" id="loginPassword" placeholder="密码">
+            <button onclick="login()">登 录</button>
+            <div id="loginError" class="error-msg"></div>
+            <div style="margin-top: 20px; font-size: 12px; color: #999;">
+                测试账号：admin / admin | wtr / wtr
+            </div>
+        </div>
+    </div>
+
+    <!-- 主界面 -->
+    <div id="mainPage" class="main-container">
+        <div class="top-bar">
+            <div class="logo">🔒 定密工作数字化管理系统</div>
+            <div class="user-info">
+                <span>👤 <span id="userName"></span></span>
+                <span class="user-badge" id="userClearance"></span>
+                <button class="logout-btn" onclick="logout()">退出登录</button>
+            </div>
+        </div>
+        <div class="dashboard">
+            <div class="sidebar">
+                <div class="menu-item active" data-page="dashboard">📊 工作台</div>
+                <div class="menu-item" data-page="files">📁 文件管理</div>
+                <div class="menu-item" data-page="classify">🔐 文件定密</div>
+                <div class="menu-item" data-page="change">🔄 密级变更</div>
+                <div class="menu-item" data-page="secretpoint">📍 密点标注</div>
+                <div class="menu-item" data-page="ai">🤖 AI智能分析</div>
+                <div class="menu-item" data-page="supervision">👁️ 定密监督</div>
+                <div id="adminMenu" style="display:none;">
+                    <div class="menu-item" data-page="staff">👥 人员管理</div>
+                    <div class="menu-item" data-page="officer">📋 定密责任人</div>
+                </div>
+            </div>
+            <div class="content-area" id="contentArea">
+                <!-- 动态内容 -->
+            </div>
+        </div>
+    </div>
+
+<script>
+    let currentUser = null;
+    let currentPage = 'dashboard';
+
+    // 显示消息
+    function showMessage(msg, type = 'success') {
+        const div = document.createElement('div');
+        div.className = `message ${type}`;
+        div.textContent = msg;
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 3000);
+    }
+
+    // 登录
+    async function login() {
+        const username = document.getElementById('loginUsername').value;
+        const password = document.getElementById('loginPassword').value;
+        
+        if (!username || !password) {
+            document.getElementById('loginError').textContent = '请输入账号和密码';
+            return;
+        }
+        
+        try {
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                currentUser = data;
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('mainPage').style.display = 'block';
+                document.getElementById('userName').textContent = data.username;
+                document.getElementById('userClearance').textContent = data.clearance;
+                
+                if (data.is_admin) {
+                    document.getElementById('adminMenu').style.display = 'block';
+                }
+                
+                loadPage('dashboard');
+            } else {
+                document.getElementById('loginError').textContent = data.message;
+            }
+        } catch (error) {
+            document.getElementById('loginError').textContent = '网络错误';
+        }
+    }
+
+    // 退出登录
+    async function logout() {
+        await fetch('/api/logout', { method: 'POST' });
+        location.reload();
+    }
+
+    // 加载页面
+    async function loadPage(page) {
+        currentPage = page;
+        const content = document.getElementById('contentArea');
+        
+        switch(page) {
+            case 'dashboard':
+                await loadDashboard(content);
+                break;
+            case 'files':
+                await loadFiles(content);
+                break;
+            case 'classify':
+                await loadClassify(content);
+                break;
+            case 'change':
+                await loadChange(content);
+                break;
+            case 'secretpoint':
+                await loadSecretPoint(content);
+                break;
+            case 'ai':
+                await loadAI(content);
+                break;
+            case 'supervision':
+                await loadSupervision(content);
+                break;
+            case 'staff':
+                await loadStaff(content);
+                break;
+            case 'officer':
+                await loadOfficer(content);
+                break;
+            default:
+                content.innerHTML = '<div class="card"><h3>欢迎使用定密管理系统</h3><p>请从左侧菜单选择功能</p></div>';
+        }
+    }
+
+    // 工作台
+    async function loadDashboard(container) {
+        const filesRes = await fetch('/api/files');
+        const filesData = await filesRes.json();
+        
+        const logsRes = await fetch('/api/audit-logs');
+        const logsData = await logsRes.json();
+        
+        const stats = {
+            total: filesData.files.length,
+            classified: filesData.files.filter(f => f.clearance_level > 0).length,
+            unclassified: filesData.files.filter(f => f.clearance_level === -1).length,
+            topsecret: filesData.files.filter(f => f.clearance_level === 3).length,
+            confidential: filesData.files.filter(f => f.clearance_level === 2).length,
+            secret: filesData.files.filter(f => f.clearance_level === 1).length,
+        };
+        
+        container.innerHTML = `
+            <div class="card">
+                <h3>📊 系统统计</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 15px;">
+                    <div style="background:#f8f9fa; padding:15px; border-radius:10px; text-align:center;">
+                        <div style="font-size:28px; font-weight:bold;">${stats.total}</div>
+                        <div>总文件数</div>
+                    </div>
+                    <div style="background:#f8f9fa; padding:15px; border-radius:10px; text-align:center;">
+                        <div style="font-size:28px; font-weight:bold; color:#28a745;">${stats.classified}</div>
+                        <div>已定密</div>
+                    </div>
+                    <div style="background:#f8f9fa; padding:15px; border-radius:10px; text-align:center;">
+                        <div style="font-size:28px; font-weight:bold; color:#6c757d;">${stats.unclassified}</div>
+                        <div>待定密</div>
+                    </div>
+                    <div style="background:#f8f9fa; padding:15px; border-radius:10px; text-align:center;">
+                        <div style="font-size:28px; font-weight:bold; color:#dc3545;">${stats.topsecret}</div>
+                        <div>绝密</div>
+                    </div>
+                    <div style="background:#f8f9fa; padding:15px; border-radius:10px; text-align:center;">
+                        <div style="font-size:28px; font-weight:bold; color:#fd7e14;">${stats.confidential}</div>
+                        <div>机密</div>
+                    </div>
+                    <div style="background:#f8f9fa; padding:15px; border-radius:10px; text-align:center;">
+                        <div style="font-size:28px; font-weight:bold; color:#ffc107;">${stats.secret}</div>
+                        <div>秘密</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>📋 最近操作记录</h3>
+                <table style="width:100%">
+                    <thead><tr><th>时间</th><th>操作人</th><th>操作类型</th><th>目标</th><th>结果</th></tr></thead>
+                    <tbody>
+                        ${logsData.logs.slice(0,8).map(log => `
+                            <tr>
+                                <td>${log.time}</td>
+                                <td>${log.operator}</td>
+                                <td>${log.type}</td>
+                                <td>${log.target}</td>
+                                <td>${log.result}</td>
+                            </tr>
+                        `).join('')}
+                        ${logsData.logs.length === 0 ? '<tr><td colspan="5">暂无记录</td></tr>' : ''}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+
+
+    // 文件列表
+    async function loadFiles(container) {
+        const res = await fetch('/api/files');
+        const data = await res.json();
+        
+        container.innerHTML = `
+            <div class="card">
+                <h3>📁 文件列表</h3>
+                ${currentUser.is_admin ? `
+                    <div style="margin-bottom:20px;">
+                        <div style="background:#f8f9fa; padding:15px; border-radius:10px; margin-bottom:15px;">
+                            <h4 style="margin-bottom:10px;">➕ 添加新文件</h4>
+                            <div class="form-group">
+                                <label>文件名</label>
+                                <input type="text" id="newFileName" placeholder="例如：工作报告" style="width:100%;">
+                            </div>
+                            <div class="form-group">
+                                <label>文件内容</label>
+                                <textarea id="newFileContent" rows="6" placeholder="请输入文件内容..." style="width:100%; font-family: monospace;"></textarea>
+                            </div>
+                            <button onclick="addFileWithContent()">📄 创建文件</button>
+                        </div>
+                    </div>
+                ` : ''}
+                <div style="overflow-x:auto;">
+                    <table style="width:100%; min-width:800px;">
+                        <thead>
+                            <tr>
+                                <th>文件名</th>
+                                <th>密级</th>
+                                <th>保密年限</th>
+                                <th>定密日期</th>
+                                <th>知悉范围</th>
+                                ${currentUser.is_admin ? '<th>操作</th>' : ''}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.files.map(f => `
+                                <tr>
+                                    <td>${escapeHtml(f.name)}</td>
+                                    <td><span class="status-badge status-${f.clearance_level === 3 ? 'topsecret' : f.clearance_level === 2 ? 'confidential' : f.clearance_level === 1 ? 'secret' : f.clearance_level === 0 ? 'unclassified' : 'unknown'}">${f.clearance}</span></td>
+                                    <td>${f.expiration_year || '-'}年</td>
+                                    <td>${f.expiration_date || '-'}</td>
+                                    <td>
+                                        ${f.know_scope ? `<div title="知悉范围">📋 ${escapeHtml(f.know_scope.substring(0, 30))}${f.know_scope.length > 30 ? '...' : ''}</div>` : '<span style="color:#999;">未设置</span>'}
+                                        ${f.know_persons ? `<div style="font-size:11px; color:#666;">👤 ${escapeHtml(f.know_persons.substring(0, 30))}</div>` : ''}
+                                        ${f.know_departments ? `<div style="font-size:11px; color:#666;">🏢 ${escapeHtml(f.know_departments.substring(0, 30))}</div>` : ''}
+                                    </td>
+                                    ${currentUser.is_admin ? `
+                                        <td>
+                                            <button class="secondary" style="padding:3px 10px;" onclick="viewFileContent('${escapeHtml(f.name)}')">查看</button>
+                                            <button class="secondary" style="padding:3px 10px; background:#dc3545;" onclick="deleteFile('${escapeHtml(f.name)}')">删除</button>
+                                        </td>
+                                    ` : ''}
+                                </tr>
+                            `).join('')}
+                            ${data.files.length === 0 ? '<tr><td colspan="6">暂无文件</td></tr>' : ''}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+
+    // 添加带内容的文件
+    async function addFileWithContent() {
+        const filename = document.getElementById('newFileName').value;
+        const content = document.getElementById('newFileContent').value;
+        
+        if (!filename) {
+            showMessage('请输入文件名', 'error');
+            return;
+        }
+        
+        const res = await fetch('/api/files/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename, content })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            showMessage(data.message);
+            document.getElementById('newFileName').value = '';
+            document.getElementById('newFileContent').value = '';
+            loadPage('files');
+        } else {
+            showMessage(data.message, 'error');
+        }
+    }
+
+    // 查看文件内容
+    async function viewFileContent(filename) {
+        // 获取文件信息
+        const filesRes = await fetch('/api/files');
+        const filesData = await filesRes.json();
+        const file = filesData.files.find(f => f.name === filename);
+        
+        if (!file) {
+            showMessage('文件不存在', 'error');
+            return;
+        }
+        
+        // 获取文件内容
+        const res = await fetch('/api/files/content', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            // 创建模态框显示内容
+            const modal = document.createElement('div');
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            modal.style.zIndex = '2000';
+            modal.style.display = 'flex';
+            modal.style.alignItems = 'center';
+            modal.style.justifyContent = 'center';
+            
+            modal.innerHTML = `
+                <div style="background:white; border-radius:15px; width:80%; max-width:800px; max-height:80%; overflow:auto; padding:25px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h3 style="color:#1a472a;">📄 ${escapeHtml(filename)}</h3>
+                        <button onclick="this.closest('div').parentElement.remove()" style="background:#dc3545; padding:5px 15px;">关闭</button>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <span class="status-badge status-${file.clearance_level === 3 ? 'topsecret' : file.clearance_level === 2 ? 'confidential' : file.clearance_level === 1 ? 'secret' : 'unknown'}">${file.clearance}</span>
+                        ${file.clearance_level === -1 ? '<span style="margin-left:10px; color:#999;">待定密</span>' : `<span style="margin-left:10px;">保密年限: ${file.expiration_year || '-'}年</span>`}
+                    </div>
+                    <div style="background:#f8f9fa; padding:15px; border-radius:10px; font-family: monospace; white-space: pre-wrap; font-size:14px; line-height:1.5;">
+                        ${escapeHtml(data.content)}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        } else {
+            showMessage(data.message, 'error');
+        }
+    }
+
+    // 删除文件
+    async function deleteFile(filename) {
+        if (!confirm(`确定要删除文件 "${filename}" 吗？此操作不可恢复！`)) return;
+        
+        const res = await fetch('/api/files/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            showMessage(data.message);
+            loadPage('files');
+        } else {
+            showMessage(data.message, 'error');
+        }
+    }
+
+    // 添加HTML转义函数（如果还没有）
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // 文件定密
+    // 文件定密
+    async function loadClassify(container) {
+        const filesRes = await fetch('/api/files');
+        const filesData = await filesRes.json();
+        const basisRes = await fetch('/api/basis-list');
+        const basisData = await basisRes.json();
+        const unclassifiedFiles = filesData.files.filter(f => f.clearance_level === -1);
+        
+        const staffRes = await fetch('/api/staff');
+        const staffData = await staffRes.json();
+        
+        container.innerHTML = `
+            <div class="card">
+                <h3>🔐 文件定密</h3>
+                <div class="form-group">
+                    <label>选择文件</label>
+                    <select id="classifyFile">
+                        <option value="">-- 请选择 --</option>
+                        ${unclassifiedFiles.map(f => `<option value="${f.name}">${f.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>定密密级</label>
+                    <select id="classifyLevel">
+                        <option value="1">秘密</option>
+                        <option value="2">机密</option>
+                        <option value="3">绝密</option>
+                    </select>
+                </div>
+                
+                <!-- 保密期限三种形式 -->
+                <div style="margin-top:20px; padding:15px; background:#f8f9fa; border-radius:10px;">
+                    <h4 style="margin-bottom:15px;">⏰ 保密期限</h4>
+                    <div class="form-group">
+                        <label>保密期限形式</label>
+                        <select id="secretTermType" onchange="toggleSecretTermForm()">
+                            <option value="年限">📅 固定年限</option>
+                            <option value="时间">📆 具体解密时间</option>
+                            <option value="条件">🔓 解密条件</option>
+                        </select>
+                    </div>
+                    <div id="termYearsForm">
+                        <div class="form-group">
+                            <label>保密年限</label>
+                            <input type="number" id="secretTermYears" value="5" min="1" max="30">
+                            <small style="color:#666;">单位：年</small>
+                        </div>
+                    </div>
+                    <div id="termDateForm" style="display:none;">
+                        <div class="form-group">
+                            <label>解密时间</label>
+                            <input type="date" id="secretTermDate">
+                            <small style="color:#666;">选择具体解密日期</small>
+                        </div>
+                    </div>
+                    <div id="termConditionForm" style="display:none;">
+                        <div class="form-group">
+                            <label>解密条件</label>
+                            <textarea id="secretTermCondition" rows="2" placeholder="例如：任务完成后、项目验收后、技术公开后" style="width:100%;"></textarea>
+                            <small style="color:#666;">描述解密的具体条件</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>定密依据</label>
+                    <select id="classifyBasis">
+                        ${basisData.basis.map(b => `<option value="${b.id}">${b.name}</option>`).join('')}
+                    </select>
+                </div>
+                
+                <div style="margin-top:20px; padding:15px; background:#f8f9fa; border-radius:10px;">
+                    <h4 style="margin-bottom:15px;">👥 知悉范围</h4>
+                    <div class="form-group">
+                        <label>知悉范围说明</label>
+                        <textarea id="knowScope" rows="2" placeholder="描述哪些人员/部门可以知悉该文件..." style="width:100%;"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>知悉人员</label>
+                        <select id="knowPersons" multiple style="width:100%; min-height:100px;">
+                            ${staffData.staff.map(s => `<option value="${s.username}">${s.username} (${s.clearance})</option>`).join('')}
+                        </select>
+                        <small style="color:#666;">按住Ctrl键可多选</small>
+                    </div>
+                    <div class="form-group">
+                        <label>知悉部门</label>
+                        <input type="text" id="knowDepartments" placeholder="例如：办公室、保密办、技术部" style="width:100%;">
+                    </div>
+                </div>
+                
+                <button onclick="classifyFile()" style="margin-top:20px;">确认定密</button>
+            </div>
+            ${unclassifiedFiles.length === 0 ? '<div class="card"><p style="color:#999;">暂无待定密文件</p></div>' : ''}
+        `;
+        
+        window.toggleSecretTermForm = function() {
+            const type = document.getElementById('secretTermType').value;
+            document.getElementById('termYearsForm').style.display = type === '年限' ? 'block' : 'none';
+            document.getElementById('termDateForm').style.display = type === '时间' ? 'block' : 'none';
+            document.getElementById('termConditionForm').style.display = type === '条件' ? 'block' : 'none';
+        };
+        toggleSecretTermForm();
+    }
+
+    // 密级变更
+    async function loadChange(container) {
+        const filesRes = await fetch('/api/files');
+        const filesData = await filesRes.json();
+        const basisRes = await fetch('/api/basis-list');
+        const basisData = await basisRes.json();
+        const classifiedFiles = filesData.files.filter(f => f.clearance_level > 0);
+        
+        container.innerHTML = `
+            <div class="card">
+                <h3>🔄 密级变更</h3>
+                <div class="form-group">
+                    <label>选择文件</label>
+                    <select id="changeFile">
+                        <option value="">-- 请选择 --</option>
+                        ${classifiedFiles.map(f => `<option value="${f.name}" data-level="${f.clearance_level}">${f.name} (当前: ${f.clearance})</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>新密级</label>
+                    <select id="changeLevel">
+                        <option value="0">非密</option>
+                        <option value="1">秘密</option>
+                        <option value="2">机密</option>
+                        <option value="3">绝密</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>变更依据</label>
+                    <select id="changeBasis">
+                        ${basisData.basis.map(b => `<option value="${b.id}">${b.name}</option>`).join('')}
+                    </select>
+                </div>
+                <button onclick="changeClassification()">确认变更</button>
+            </div>
+        `;
+    }
+
+    // 密点标注
+    async function loadSecretPoint(container) {
+        const filesRes = await fetch('/api/files');
+        const filesData = await filesRes.json();
+        
+        container.innerHTML = `
+            <div class="card">
+                <h3>📍 密点标注</h3>
+                <div class="form-group">
+                    <label>选择文件</label>
+                    <select id="spFile" onchange="loadSecretPointsList()">
+                        <option value="">-- 请选择 --</option>
+                        ${filesData.files.map(f => `<option value="${f.name}">${f.name} (${f.clearance})</option>`).join('')}
+                    </select>
+                </div>
+                <div id="secretPointsList"></div>
+                <div id="addPointForm" style="display:none; margin-top:20px;">
+                    <div class="form-group">
+                        <label>密点内容</label>
+                        <textarea id="pointContent" placeholder="请输入密点内容"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>密级</label>
+                        <select id="pointLevel">
+                            <option value="1">秘密</option>
+                            <option value="2">机密</option>
+                            <option value="3">绝密</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>位置</label>
+                        <input type="text" id="pointLocation" placeholder="如：第3页第2段">
+                    </div>
+                    <div class="flex">
+                        <button onclick="addSecretPoint()">添加密点</button>
+                        <button class="secondary" onclick="cancelAddPoint()">取消</button>
+                    </div>
+                </div>
+                <button style="margin-top:15px;" onclick="showAddPointForm()">+ 添加密点</button>
+            </div>
+        `;
+    }
+
+    async function loadSecretPointsList() {
+        const filename = document.getElementById('spFile').value;
+        if (!filename) return;
+        
+        const res = await fetch(`/api/files/secret-points/${encodeURIComponent(filename)}`);
+        const data = await res.json();
+        
+        const container = document.getElementById('secretPointsList');
+        if (data.points.length === 0) {
+            container.innerHTML = '<p style="color:#999; margin-top:10px;">暂无密点标注</p>';
+        } else {
+            container.innerHTML = `
+                <h4 style="margin:15px 0 10px;">已有密点：</h4>
+                ${data.points.map((p, i) => `
+                    <div class="point-item point-level-${p.level}">
+                        <strong>${p.level === 3 ? '🔴' : p.level === 2 ? '🟠' : '🟡'} ${p.level === 3 ? '绝密' : p.level === 2 ? '机密' : '秘密'}</strong>
+                        <div>内容：${p.content}</div>
+                        <div style="font-size:12px; color:#666;">位置：${p.location}</div>
+                    </div>
+                `).join('')}
+            `;
+        }
+    }
+
+    function showAddPointForm() {
+        document.getElementById('addPointForm').style.display = 'block';
+    }
+
+    function cancelAddPoint() {
+        document.getElementById('addPointForm').style.display = 'none';
+        document.getElementById('pointContent').value = '';
+        document.getElementById('pointLocation').value = '';
+    }
+
+    async function addSecretPoint() {
+        const filename = document.getElementById('spFile').value;
+        const content = document.getElementById('pointContent').value;
+        const level = parseInt(document.getElementById('pointLevel').value);
+        const location = document.getElementById('pointLocation').value;
+        
+        if (!filename) {
+            showMessage('请先选择文件', 'error');
+            return;
+        }
+        if (!content) {
+            showMessage('请输入密点内容', 'error');
+            return;
+        }
+        
+        const res = await fetch('/api/files/secret-points/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename, content, level, location })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            showMessage('密点添加成功');
+            cancelAddPoint();
+            await loadSecretPointsList();
+        } else {
+            showMessage(data.message, 'error');
+        }
+    }
+
+    // AI智能分析
+    async function loadAI(container) {
+        const filesRes = await fetch('/api/files');
+        const filesData = await filesRes.json();
+        const basisRes = await fetch('/api/basis-list');
+        const basisData = await basisRes.json();
+        
+        container.innerHTML = `
+            <div class="card">
+                <h3>🤖 AI智能密点识别与分析</h3>
+                <div class="form-group">
+                    <label>选择要分析的文件</label>
+                    <select id="aiFile">
+                        <option value="">-- 请选择 --</option>
+                        ${filesData.files.map(f => `<option value="${f.name}">${f.name} (${f.clearance})</option>`).join('')}
+                    </select>
+                </div>
+                <button onclick="analyzeFile()">开始分析</button>
+                <div id="aiResult" style="margin-top:20px;"></div>
+            </div>
+        `;
+    }
+
+    async function analyzeFile() {
+        const filename = document.getElementById('aiFile').value;
+        if (!filename) {
+            showMessage('请选择文件', 'error');
+            return;
+        }
+        
+        const resultDiv = document.getElementById('aiResult');
+        resultDiv.innerHTML = '<div style="text-align:center; padding:20px;"><span class="loading"></span> AI分析中，请稍候...</div>';
+        
+        try {
+            console.log('开始分析文件:', filename);
+            
+            const res = await fetch('/api/ai/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename })
+            });
+            
+            console.log('响应状态:', res.status);
+            
+            if (!res.ok) {
+                throw new Error(`HTTP错误: ${res.status}`);
+            }
+            
+            const data = await res.json();
+            console.log('响应数据:', data);
+            
+            if (!data.success) {
+                resultDiv.innerHTML = `<div class="ai-result" style="border-left-color:#dc3545;">
+                    <strong>❌ 分析失败</strong><br>${data.message || '未知错误'}
+                </div>`;
+                return;
+            }
+            
+            const levelName = data.recommended_level === 3 ? '绝密' : 
+                            data.recommended_level === 2 ? '机密' : 
+                            data.recommended_level === 1 ? '秘密' : '非密';
+            const levelColor = data.recommended_level === 3 ? '#dc3545' : 
+                            data.recommended_level === 2 ? '#fd7e14' : 
+                            data.recommended_level === 1 ? '#ffc107' : '#28a745';
+            
+            resultDiv.innerHTML = `
+                <div class="ai-result" style="background:#e8f5e9; border-left:4px solid #4caf50; padding:15px; margin:15px 0; border-radius:8px;">
+                    <strong>📊 AI分析结果</strong><br>
+                    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:15px 0;">
+                        <div style="background:#fff; padding:10px; border-radius:8px; text-align:center;">
+                            <div style="font-size:12px; color:#666;">文件大小</div>
+                            <div style="font-size:18px; font-weight:bold;">${(data.content_length/1024).toFixed(1)} KB</div>
+                        </div>
+                        <div style="background:#fff; padding:10px; border-radius:8px; text-align:center;">
+                            <div style="font-size:12px; color:#666;">敏感密度</div>
+                            <div style="font-size:18px; font-weight:bold;">${(data.density * 100).toFixed(1)}%</div>
+                        </div>
+                        <div style="background:#fff; padding:10px; border-radius:8px; text-align:center;">
+                            <div style="font-size:12px; color:#666;">发现密点</div>
+                            <div style="font-size:18px; font-weight:bold; color:${levelColor};">${data.total_points}</div>
+                        </div>
+                    </div>
+                    <div style="margin:10px 0;">
+                        <span style="color:${levelColor}; font-size:18px; font-weight:bold;">推荐密级：${levelName}</span>
+                    </div>
+                    <div style="margin-top:10px; padding:10px; background:#fff; border-radius:8px;">
+                        <strong>📝 分析理由：</strong> ${data.reason}
+                    </div>
+                </div>
+                <div class="card" style="margin-top:15px;">
+                    <h4>⚠️ 检测到的敏感信息 <span style="font-size:12px; color:#666;">(共${data.total_points}处)</span></h4>
+                    ${data.detected_points.length === 0 ? '<p>✅ 未检测到明显敏感信息</p>' : `
+                        <div style="max-height:400px; overflow-y:auto;">
+                            ${data.detected_points.map((p, idx) => `
+                                <div class="point-item point-level-${p.level}" style="margin-bottom:10px; padding:10px; background:#f8f9fa; border-radius:8px; border-left:3px solid ${p.level === 3 ? '#dc3545' : p.level === 2 ? '#fd7e14' : '#ffc107'};">
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <strong>${p.level === 3 ? '🔴 绝密' : p.level === 2 ? '🟠 机密' : '🟡 秘密'}</strong>
+                                        <span style="font-size:11px; color:#666;">${p.location || '位置未知'}</span>
+                                    </div>
+                                    <div style="margin-top:8px; font-size:13px; color:#555;">${escapeHtml(p.content)}</div>
+                                    <div style="margin-top:5px; font-size:11px; color:#999;">类型：${p.type || '敏感信息'}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div style="margin-top:15px;">
+                            <label>定密依据</label>
+                            <select id="autoBasis" class="form-control" style="width:100%; padding:8px; margin:10px 0;">
+                                ${window.basisList ? window.basisList.map(b => `<option value="${b.id}">${b.name}</option>`).join('') : '<option>加载中...</option>'}
+                            </select>
+                            <div class="flex" style="gap:10px; margin-top:10px;">
+                                <button onclick="autoClassify('${filename}', ${data.recommended_level})" style="flex:1;">✅ 采纳建议并自动标注密点</button>
+                                <button class="secondary" onclick="onlyMarkPoints('${filename}')" style="flex:1;">📍 仅标注密点（不定密）</button>
+                            </div>
+                        </div>
+                    `}
+                </div>
+            `;
+            
+            // 保存当前分析结果
+            window.currentAnalysis = { 
+                filename, 
+                points: data.detected_points, 
+                recommended_level: data.recommended_level 
+            };
+            
+        } catch (error) {
+            console.error('分析出错:', error);
+            resultDiv.innerHTML = `<div class="ai-result" style="border-left-color:#dc3545;">
+                <strong>❌ 分析失败</strong><br>网络错误：${error.message}
+            </div>`;
+        }
+    }
+
+    // 加载定密依据列表（在页面加载时调用）
+    async function loadBasisList() {
+        try {
+            const res = await fetch('/api/basis-list');
+            const data = await res.json();
+            if (data.success) {
+                window.basisList = data.basis;
+            }
+        } catch (error) {
+            console.error('加载定密依据失败:', error);
+        }
+    }
+
+    // 页面加载时调用
+    document.addEventListener('DOMContentLoaded', () => {
+        loadBasisList();
+    });
+
+    async function autoClassify(filename, level) {
+        const basisId = document.getElementById('autoBasis')?.value || 'B001';
+        const points = window.currentAnalysis?.points || [];
+        
+        const res = await fetch('/api/ai/auto-classify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename, level, basis_id: basisId, points })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            showMessage(data.message);
+            loadPage('ai');
+        } else {
+            showMessage(data.message, 'error');
+        }
+    }
+
+    async function onlyMarkPoints(filename) {
+        const points = window.currentAnalysis?.points || [];
+        
+        const res = await fetch('/api/ai/auto-classify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename, level: 0, basis_id: '', points })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            showMessage(data.message);
+            loadPage('ai');
+        } else {
+            showMessage(data.message, 'error');
+        }
+    }
+
+    // 定密监督
+    async function loadSupervision(container) {
+        const logsRes = await fetch('/api/audit-logs');
+        const logsData = await logsRes.json();
+        
+        container.innerHTML = `
+            <div class="card">
+                <h3>👁️ 定密监督 - 审计日志</h3>
+                <table style="width:100%">
+                    <thead><tr><th>时间</th><th>操作人</th><th>操作类型</th><th>目标</th><th>结果</th><th>详情</th></tr></thead>
+                    <tbody>
+                        ${logsData.logs.map(log => `
+                            <tr>
+                                <td>${log.time}</td>
+                                <td>${log.operator}</td>
+                                <td>${log.type}</td>
+                                <td>${log.target}</td>
+                                <td style="color:${log.result === '成功' ? '#28a745' : '#dc3545'}">${log.result}</td>
+                                <td>${log.details}</td>
+                            </tr>
+                        `).join('')}
+                        ${logsData.logs.length === 0 ? '<tr><td colspan="6">暂无记录</td></tr>' : ''}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    // 人员管理
+    async function loadStaff(container) {
+        const res = await fetch('/api/staff');
+        const data = await res.json();
+        
+        container.innerHTML = `
+            <div class="card">
+                <h3>👥 涉密人员管理</h3>
+                <div style="margin-bottom:20px;">
+                    <div class="flex">
+                        <input type="text" id="newStaffName" placeholder="账号" style="flex:1;">
+                        <input type="password" id="newStaffPwd" placeholder="密码" style="flex:1;">
+                        <select id="newStaffClearance" style="width:120px;">
+                            <option value="0">非密</option>
+                            <option value="1">秘密</option>
+                            <option value="2">机密</option>
+                            <option value="3">绝密</option>
+                        </select>
+                        <button onclick="addStaff()">添加人员</button>
+                    </div>
+                </div>
+                <table style="width:100%">
+                    <thead><tr><th>ID</th><th>账号</th><th>权限</th><th>是否为管理员</th></tr></thead>
+                    <tbody>
+                        ${data.staff.map(s => `
+                            <tr>
+                                <td>${s.id}</td>
+                                <td>${s.username}</td>
+                                <td><span class="status-badge status-${s.clearance_level === 3 ? 'topsecret' : s.clearance_level === 2 ? 'confidential' : s.clearance_level === 1 ? 'secret' : 'unclassified'}">${s.clearance}</span></td>
+                                <td>${s.is_admin ? '是' : '否'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    // 定密责任人
+    async function loadOfficer(container) {
+        const res = await fetch('/api/officers');
+        const data = await res.json();
+        
+        container.innerHTML = `
+            <div class="card">
+                <h3>📋 定密责任人管理</h3>
+                <div style="margin-bottom:20px; padding:15px; background:#f8f9fa; border-radius:10px;">
+                    <h4 style="margin-bottom:10px;">➕ 添加定密责任人</h4>
+                    <div class="flex">
+                        <input type="text" id="offName" placeholder="姓名" style="flex:1;">
+                        <input type="text" id="offPosition" placeholder="职务" style="flex:1;">
+                        <input type="text" id="offResponsibility" placeholder="职责范围" style="flex:1;">
+                        <select id="offMaxLevel" style="width:100px;">
+                            <option value="1">秘密</option>
+                            <option value="2">机密</option>
+                            <option value="3">绝密</option>
+                        </select>
+                        <button onclick="addOfficer()">添加责任人</button>
+                    </div>
+                </div>
+                <h4>📋 现任定密责任人列表</h4>
+                <div id="officerList"></div>
+            </div>
+        `;
+        
+        const officerListDiv = document.getElementById('officerList');
+        if (data.officers.length === 0) {
+            officerListDiv.innerHTML = '<p style="color:#999;">暂无定密责任人</p>';
+        } else {
+            officerListDiv.innerHTML = `
+                <table style="width:100%">
+                    <thead>
+                        <tr><th>ID</th><th>姓名</th><th>职务</th><th>任命日期</th><th>职责范围</th><th>最高权限</th><th>操作</th></tr>
+                    </thead>
+                    <tbody>
+                        ${data.officers.map(o => `
+                            <tr>
+                                <td>${o.id}</td>
+                                <td>${o.name}</td>
+                                <td>${o.position}</td>
+                                <td>${o.appoint_date}</td>
+                                <td>${o.responsibility || '-'}</td>
+                                <td><span class="status-badge ${o.max_level === 3 ? 'status-topsecret' : o.max_level === 2 ? 'status-confidential' : 'status-secret'}">${o.max_level === 3 ? '绝密' : o.max_level === 2 ? '机密' : '秘密'}</span></td>
+                                <td><button class="secondary" style="padding:5px 10px;" onclick="deleteOfficer(${o.id})">删除</button></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+    }
+
+    async function deleteOfficer(officerId) {
+        if (!confirm('确定要删除该定密责任人吗？')) return;
+        
+        const res = await fetch(`/api/officers/delete/${officerId}`, {
+            method: 'DELETE'
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            showMessage(data.message);
+            loadPage('officer');
+        } else {
+            showMessage(data.message, 'error');
+        }
+    }
+
+    // API调用函数
+    async function addFile() {
+        const filename = document.getElementById('newFileName').value;
+        if (!filename) {
+            showMessage('请输入文件名', 'error');
+            return;
+        }
+        const res = await fetch('/api/files/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showMessage(data.message);
+            document.getElementById('newFileName').value = '';
+            loadPage('files');
+        } else {
+            showMessage(data.message, 'error');
+        }
+    }
+
+    async function classifyFile() {
+        const filename = document.getElementById('classifyFile').value;
+        const level = parseInt(document.getElementById('classifyLevel').value);
+        const basisId = document.getElementById('classifyBasis').value;
+        
+        // 获取保密期限三种形式
+        const secretTermType = document.getElementById('secretTermType').value;
+        const secretTermYears = parseInt(document.getElementById('secretTermYears').value) || 0;
+        const secretTermDate = document.getElementById('secretTermDate').value;
+        const secretTermCondition = document.getElementById('secretTermCondition').value;
+        
+        const knowScope = document.getElementById('knowScope').value;
+        const knowPersonsSelect = document.getElementById('knowPersons');
+        const knowPersons = Array.from(knowPersonsSelect.selectedOptions).map(opt => opt.value).join(',');
+        const knowDepartments = document.getElementById('knowDepartments').value;
+        
+        if (!filename) {
+            showMessage('请选择文件', 'error');
+            return;
+        }
+        
+        // 验证保密期限
+        if (secretTermType === '年限' && (!secretTermYears || secretTermYears <= 0)) {
+            showMessage('请填写有效的保密年限', 'error');
+            return;
+        }
+        if (secretTermType === '时间' && !secretTermDate) {
+            showMessage('请选择解密时间', 'error');
+            return;
+        }
+        if (secretTermType === '条件' && !secretTermCondition.trim()) {
+            showMessage('请填写解密条件', 'error');
+            return;
+        }
+        
+        const res = await fetch('/api/files/classify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                filename, 
+                level, 
+                basis_id: basisId,
+                secret_term_type: secretTermType,
+                secret_term_years: secretTermYears,
+                secret_term_date: secretTermDate,
+                secret_term_condition: secretTermCondition,
+                know_scope: knowScope,
+                know_persons: knowPersons,
+                know_departments: knowDepartments
+            })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showMessage(data.message);
+            loadPage('classify');
+        } else {
+            showMessage(data.message, 'error');
+        }
+    }
+
+    async function changeClassification() {
+        const filename = document.getElementById('changeFile').value;
+        const newLevel = parseInt(document.getElementById('changeLevel').value);
+        const basisId = document.getElementById('changeBasis').value;
+        
+        if (!filename) {
+            showMessage('请选择文件', 'error');
+            return;
+        }
+        
+        const res = await fetch('/api/files/change', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename, new_level: newLevel, basis_id: basisId })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showMessage(data.message);
+            loadPage('change');
+        } else {
+            showMessage(data.message, 'error');
+        }
+    }
+
+    async function addStaff() {
+        const username = document.getElementById('newStaffName').value;
+        const password = document.getElementById('newStaffPwd').value;
+        const clearance = parseInt(document.getElementById('newStaffClearance').value);
+        
+        if (!username || !password) {
+            showMessage('请填写完整信息', 'error');
+            return;
+        }
+        
+        const res = await fetch('/api/staff/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, clearance })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showMessage(data.message);
+            document.getElementById('newStaffName').value = '';
+            document.getElementById('newStaffPwd').value = '';
+            loadPage('staff');
+        } else {
+            showMessage(data.message, 'error');
+        }
+    }
+
+    async function addOfficer() {
+        const name = document.getElementById('offName').value;
+        const position = document.getElementById('offPosition').value;
+        const responsibility = document.getElementById('offResponsibility').value;
+        const max_level = parseInt(document.getElementById('offMaxLevel').value);
+        
+        if (!name || !position) {
+            showMessage('请填写姓名和职务', 'error');
+            return;
+        }
+        
+        const res = await fetch('/api/officers/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, position, responsibility, max_level })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            showMessage(data.message);
+            document.getElementById('offName').value = '';
+            document.getElementById('offPosition').value = '';
+            document.getElementById('offResponsibility').value = '';
+            loadPage('officer');
+        } else {
+            showMessage(data.message, 'error');
+        }
+    }
+
+    // 菜单点击事件
+    document.addEventListener('click', (e) => {
+        const menuItem = e.target.closest('.menu-item');
+        if (menuItem && menuItem.dataset.page) {
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            menuItem.classList.add('active');
+            loadPage(menuItem.dataset.page);
+        }
+    });
+</script>
+</body>
+</html>
