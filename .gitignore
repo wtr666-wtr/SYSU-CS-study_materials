@@ -1,0 +1,21 @@
+# Reasonix 工具目录
+.reasonix/
+
+# Windows 系统文件
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+$RECYCLE.BIN/
+
+# 编辑器/系统临时文件
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+
+# 超过 GitHub 100MB 单文件限制，不上传
+/定密理论与实务/定密工作数字化管理系统设计.zip
+/定密理论与实务/定密系统system/code/dist/定密管理系统.exe
+/定密理论与实务/定密系统system/code/build/定密管理系统/定密管理系统.pkg
+/毛概/课件/第 4 章 社会主义建设道路初步探索的理论成果.pptx
